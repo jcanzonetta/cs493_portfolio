@@ -146,7 +146,7 @@ function removeLoadFromBoat(boat, load) {
  * @return {bool}
  */
 async function isDuplicateBoatName(name) {
-  const nameQuery = datastore.createQuery(BOAT).filter('name', name);
+  const nameQuery = datastore.createQuery(BOAT).filter('name', '=', name);
   const matches = await datastore.runQuery(nameQuery);
 
   if (matches[0].length > 0) {

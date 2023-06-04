@@ -28,7 +28,6 @@ router.use(express.urlencoded({extended: true}));
 const handleUnauthorized = function(err, req, res, next) {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send({Error: 'Unauthorized'});
-    next;
   }
 };
 
