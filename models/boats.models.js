@@ -56,17 +56,27 @@ async function postBoat(name, type, length, sub) {
  * @param {string/null} owner
  * @return {Object} Datastore Object
  */
-async function getBoats(owner) {
-  const query = datastore.createQuery(BOAT);
+async function getBoats() {
+  let query = datastore.createQuery(BOAT).limit(5);
+  const results = {};
 
-  if (owner) {
-    query.filter('owner', '=', owner);
-  } else {
-    query.filter('public', '=', true);
+  if (Object.keys(req.query).includes('cursor')) {
+    query = query.start(req.query.cursor);
   }
 
   const entities = await datastore.runQuery(query);
-  return entities[0].map(fromDatastore);
+  results.boats = entities[0].map(ds.fromDatastore);
+
+  if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
+    results.next =
+      req.protocol +
+      '://' +
+      req.get('host') +
+      req.baseUrl +
+      '?cursor=' +
+      entities[1].endCursor;
+  }
+  return results;
 }
 
 /**

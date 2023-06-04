@@ -9,19 +9,12 @@ import {
   isDuplicateBoatName,
 } from '../models/boats.models.js';
 import {getSelfUrl} from '../utils/general.utils.js';
-import {datastore} from '../datastore.js';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
 
 router.use(express.json());
 router.use(express.urlencoded({extended: true}));
-
-const allowUnauthorized = function(err, req, res, next) {
-  if (err.name === 'UnauthorizedError') {
-    next();
-  }
-};
 
 /*
  *  Boat Endpoints
@@ -60,12 +53,14 @@ router.post('/', requiredJwt, async (req, res) => {
 router.get('/:boat_id', checkJwt, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
+    return;
   }
 
   const boat = await getBoat(req.params.boat_id);
 
   if (boat[0] === undefined || boat[0] === null) {
     res.status(404).send({Error: 'No boat with this boat_id exists'});
+    return;
   }
 
   boat[0].self = getSelfUrl(req, req.params.boat_id);
@@ -73,9 +68,12 @@ router.get('/:boat_id', checkJwt, async (req, res) => {
 });
 
 router.get('/', checkJwt, async (req, res) => {
-  const owner = req.auth ? req.auth.sub : null;
+  if (!req.accepts(['application/json'])) {
+    res.status(406).send({Error: 'Response body must be JSON'});
+    return;
+  }
 
-  const boats = await getBoats(owner);
+  const boats = await getBoats();
 
   res.status(200).send(boats);
 });
