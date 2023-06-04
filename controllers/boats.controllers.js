@@ -9,7 +9,7 @@ import {
   isDuplicateBoatName,
   putLoad,
 } from '../models/boats.models.js';
-import {assignLoadToBoat} from '../models/boats.models.js';
+import {assignLoadToBoat} from '../models/loads.models.js';
 import {getSelfUrl} from '../utils/general.utils.js';
 
 // eslint-disable-next-line new-cap

@@ -5,7 +5,7 @@ import {auth} from 'express-openid-connect';
 
 ***REMOVED***
 ***REMOVED***
-  ***REMOVED***
+***REMOVED***
 ***REMOVED***
 ***REMOVED***
 
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
       },
       {
         '<>': 'a',
-        'href': 'BASEURL' + 'logout',
+        'href': BASEURL + 'logout',
         'text': 'Logout',
       },
     ];

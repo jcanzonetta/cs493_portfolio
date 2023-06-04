@@ -95,7 +95,7 @@ router.patch('/:load_id', async (req, res) => {
   });
 });
 
-router.put('/:boat_id', requireJwt, async (req, res) => {
+router.put('/:boat_id', async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -125,7 +125,7 @@ router.put('/:boat_id', requireJwt, async (req, res) => {
   });
 });
 
-router.delete('/:load_id', requireJwt, async (req, res) => {
+router.delete('/:load_id', async (req, res) => {
   const load = await getLoad(req.params.load_id);
 
   if (load[0] === undefined || load[0] === null) {
