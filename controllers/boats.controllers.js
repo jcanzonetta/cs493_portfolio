@@ -1,6 +1,6 @@
 import express from 'express';
 
-import {requiredJwt, checkJwt} from '../utils/jwt.utils.js';
+import {requireJwt} from '../utils/jwt.utils.js';
 import {
   getBoat,
   postBoat,
@@ -20,7 +20,7 @@ router.use(express.urlencoded({extended: true}));
  *  Boat Endpoints
  */
 
-router.post('/', requiredJwt, async (req, res) => {
+router.post('/', requireJwt, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -50,7 +50,7 @@ router.post('/', requiredJwt, async (req, res) => {
   });
 });
 
-router.get('/:boat_id', checkJwt, async (req, res) => {
+router.get('/:boat_id', requireJwt, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -67,7 +67,7 @@ router.get('/:boat_id', checkJwt, async (req, res) => {
   res.status(200).json(boat[0]);
 });
 
-router.get('/', checkJwt, async (req, res) => {
+router.get('/', requireJwt, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -78,7 +78,7 @@ router.get('/', checkJwt, async (req, res) => {
   res.status(200).send(boats);
 });
 
-router.delete('/:boat_id', requiredJwt, async (req, res) => {
+router.delete('/:boat_id', requireJwt, async (req, res) => {
   const boat = await getBoat(req.params.boat_id);
   if (boat[0] === undefined || boat[0] === null) {
     res.status(403).send({Error: 'No boat with this boat_id exists'});
