@@ -90,17 +90,28 @@ router.patch('/:load_id', async (req, res) => {
   const volume = 'volume' in req.body ? req.body['volume'] : load[0].volume;
 
   const key = await updateLoad(load, item, creationDate, volume);
-  res.status(200).send({
+
+  const updatedLoad = {
     id: key.id,
     item: item,
     creation_date: creationDate,
     volume: volume,
     carrier: load[0].carrier,
     self: getSelfUrl(req, key.id),
-  });
+  };
+
+  if (updatedLoad.carrier !== null) {
+    updatedLoad.carrier.self = getSelfUrl(
+        req,
+        updatedLoad.carrier.id,
+        'loads',
+    );
+  }
+
+  res.status(200).send(updatedLoad);
 });
 
-router.put('/:boat_id', async (req, res) => {
+router.put('/:load_id', async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -120,14 +131,25 @@ router.put('/:boat_id', async (req, res) => {
   const volume = 'volume' in req.body ? req.body['volume'] : load[0].volume;
 
   const key = await updateLoad(load, item, creationDate, volume);
-  res.status(200).send({
+
+  const updatedLoad = {
     id: key.id,
     item: item,
     creation_date: creationDate,
     volume: volume,
     carrier: load[0].carrier,
     self: getSelfUrl(req, key.id),
-  });
+  };
+
+  if (updatedLoad.carrier !== null) {
+    updatedLoad.carrier.self = getSelfUrl(
+        req,
+        updatedLoad.carrier.id,
+        'loads',
+    );
+  }
+
+  res.status(200).send(updatedLoad);
 });
 
 router.delete('/:load_id', async (req, res) => {
