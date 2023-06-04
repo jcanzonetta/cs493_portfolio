@@ -1,7 +1,13 @@
 import express from 'express';
 
 import {getSelfUrl} from '../utils/general.utils.js';
-import {postLoad, getLoad, getAllLoads} from '../models/loads.models.js';
+import {
+  postLoad,
+  getLoad,
+  getAllLoads,
+  updateLoad,
+  deleteLoad,
+} from '../models/loads.models.js';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -57,6 +63,77 @@ router.get('/', async (req, res) => {
   const loads = await getAllLoads();
 
   res.status(200).send(loads);
+});
+
+router.patch('/:load_id', async (req, res) => {
+  if (!req.accepts(['application/json'])) {
+    res.status(406).send({Error: 'Response body must be JSON'});
+    return;
+  }
+
+  const load = await getLoad(req.params.load_id);
+  if (load[0] === undefined || load[0] === null) {
+    res.status(404).send({Error: 'No load with this load_id exists'});
+    return;
+  }
+
+  const item = 'item' in req.body ? req.body['item'] : load[0].item;
+  const creationDate =
+    'creation_date' in req.body ?
+      req.body['creation_date'] :
+      load[0].creation_date;
+  const volume = 'volume' in req.body ? req.body['volume'] : load[0].volume;
+
+  const key = await updateLoad(load, item, creationDate, volume);
+  res.status(200).send({
+    id: key.id,
+    item: item,
+    creation_date: creationDate,
+    volume: volume,
+    carrier: load[0].carrier,
+    self: getSelfUrl(req, key.id),
+  });
+});
+
+router.put('/:boat_id', requireJwt, async (req, res) => {
+  if (!req.accepts(['application/json'])) {
+    res.status(406).send({Error: 'Response body must be JSON'});
+    return;
+  }
+
+  const load = await getLoad(req.params.load_id);
+  if (load[0] === undefined || load[0] === null) {
+    res.status(404).send({Error: 'No load with this load_id exists'});
+    return;
+  }
+
+  const item = 'item' in req.body ? req.body['item'] : load[0].item;
+  const creationDate =
+    'creation_date' in req.body ?
+      req.body['creation_date'] :
+      load[0].creation_date;
+  const volume = 'volume' in req.body ? req.body['volume'] : load[0].volume;
+
+  const key = await updateLoad(load, item, creationDate, volume);
+  res.status(200).send({
+    id: key.id,
+    item: item,
+    creation_date: creationDate,
+    volume: volume,
+    carrier: load[0].carrier,
+    self: getSelfUrl(req, key.id),
+  });
+});
+
+router.delete('/:load_id', requireJwt, async (req, res) => {
+  const load = await getLoad(req.params.load_id);
+
+  if (load[0] === undefined || load[0] === null) {
+    res.status(404).send({Error: 'No load with this load_id exists'});
+  } else {
+    deleteLoad(req.params.load_id);
+    res.status(204).send();
+  }
 });
 
 export default router;

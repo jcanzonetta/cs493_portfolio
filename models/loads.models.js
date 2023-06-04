@@ -72,4 +72,36 @@ async function getAllLoads() {
   return results;
 }
 
-export {postLoad, getLoad, getAllLoads};
+/**
+ * Updates all properties of a load.
+ * @param {Object} load Datastore object
+ * @param {string} item
+ * @param {string} creationDate
+ * @param {string} volume
+ * @return {Object} Datastore object
+ */
+function updateLoad(load, item, creationDate, volume) {
+  const key = datastore.key([LOAD, parseInt(load[0].id, 10)]);
+
+  const data = {
+    item: item,
+    creation_date: creationDate,
+    volume: volume,
+    carrier: load[0].carrier,
+  };
+
+  return datastore.save({key: key, data: data});
+}
+
+/**
+ * Removes a load from Datastore and unloads from it from its carrier
+ * if necessary.
+ * @param {string} loadId
+ */
+async function deleteLoad(loadId) {
+  const key = datastore.key([LOAD, parseInt(loadId, 10)]);
+
+  datastore.delete(key);
+}
+
+export {postLoad, getLoad, getAllLoads, updateLoad, deleteLoad};

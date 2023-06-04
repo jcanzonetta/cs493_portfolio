@@ -91,6 +91,11 @@ router.patch('/:boat_id', requireJwt, async (req, res) => {
 
   const boat = await getBoat(req.params.boat_id);
   if (boat[0] === undefined || boat[0] === null) {
+    res.status(404).send({Error: 'No boat with this boat_id exists'});
+    return;
+  }
+
+  if (boat[0].owner != req.auth.sub) {
     res.status(401).send({Error: 'Unauthorized'});
     return;
   }
@@ -127,6 +132,11 @@ router.put('/:boat_id', requireJwt, async (req, res) => {
 
   const boat = await getBoat(req.params.boat_id);
   if (boat[0] === undefined || boat[0] === null) {
+    res.status(404).send({Error: 'No boat with this boat_id exists'});
+    return;
+  }
+
+  if (boat[0].owner != req.auth.sub) {
     res.status(401).send({Error: 'Unauthorized'});
     return;
   }
@@ -158,9 +168,9 @@ router.put('/:boat_id', requireJwt, async (req, res) => {
 router.delete('/:boat_id', requireJwt, async (req, res) => {
   const boat = await getBoat(req.params.boat_id);
   if (boat[0] === undefined || boat[0] === null) {
-    res.status(403).send({Error: 'No boat with this boat_id exists'});
+    res.status(404).send({Error: 'No boat with this boat_id exists'});
   } else if (boat[0].owner !== req.auth.sub) {
-    res.status(403).send({Error: 'You don\'t own this boat'});
+    res.status(401).send({Error: 'Unauthorized'});
   } else {
     deleteBoat(req.params.boat_id);
     res.status(204).send();
