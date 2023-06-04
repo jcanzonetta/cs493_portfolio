@@ -156,6 +156,25 @@ async function isDuplicateBoatName(name) {
   }
 }
 
+/**
+ * Assigns a load to a boat and updates properties for both in Datastore.
+ * @param {string} loadId
+ * @param {Object} boat
+ */
+function putLoad(loadId, boat) {
+  const boatKey = datastore.key([BOAT, parseInt(boat[0].id, 10)]);
+  boat[0].loads.push({id: loadId});
+  datastore.update({
+    key: boatKey,
+    data: {
+      name: boat[0].name,
+      type: boat[0].type,
+      length: boat[0].length,
+      loads: boat[0].loads,
+    },
+  });
+}
+
 export {
   getBoat,
   postBoat,
@@ -164,4 +183,5 @@ export {
   deleteBoat,
   removeLoadFromBoat,
   isDuplicateBoatName,
+  putLoad,
 };

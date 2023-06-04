@@ -7,7 +7,9 @@ import {
   deleteBoat,
   getAllBoats,
   isDuplicateBoatName,
+  putLoad,
 } from '../models/boats.models.js';
+import {assignLoadToBoat} from '../models/boats.models.js';
 import {getSelfUrl} from '../utils/general.utils.js';
 
 // eslint-disable-next-line new-cap
@@ -173,6 +175,57 @@ router.delete('/:boat_id', requireJwt, async (req, res) => {
     res.status(401).send({Error: 'Unauthorized'});
   } else {
     deleteBoat(req.params.boat_id);
+    res.status(204).send();
+  }
+});
+
+router.put('/:boat_id/loads/:load_id', requireJwt, async (req, res) => {
+  const boat = await getBoat(req.params.boat_id);
+  const load = await getLoad(req.params.load_id);
+
+  if (boat[0].owner != req.auth.sub) {
+    res.status(401).send({Error: 'Unauthorized'});
+  } else if (
+    boat[0] === undefined ||
+    boat[0] === null ||
+    load[0] === undefined ||
+    load[0] === null
+  ) {
+    res
+        .status(404)
+        .send({Error: 'The specified boat and/or load does not exist'});
+  } else if (load[0].carrier !== null) {
+    res
+        .status(403)
+        .send({Error: 'The load is already on another boat'});
+  } else {
+    putLoad(req.params.load_id, boat);
+    assignLoadToBoat(boat, load);
+    res.status(204).send();
+  }
+});
+
+router.delete('/:boat_id/loads/:load_id', requireJwt, async (req, res) => {
+  const boat = await getBoat(req.params.boat_id);
+  const load = await getLoad(req.params.load_id);
+
+  if (boat[0].owner != req.auth.sub) {
+    res.status(401).send({Error: 'Unauthorized'});
+  } else if (
+    boat[0] === undefined ||
+    boat[0] === null ||
+    load[0] === undefined ||
+    load[0] === null ||
+    load[0].carrier === null ||
+    load[0].carrier.id !== req.params.boat_id
+  ) {
+    res.status(404).send({
+      Error:
+        'No boat with this boat_id is loaded with the load with this load_id',
+    });
+  } else {
+    removeLoadFromBoat(boat, load);
+    clearLoadCarrier(load);
     res.status(204).send();
   }
 });

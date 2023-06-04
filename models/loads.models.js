@@ -129,11 +129,33 @@ function clearLoadCarrier(load) {
   });
 }
 
+/**
+ * Assigns a load to a boat in Datastore
+ * @param {Object} boat
+ * @param {Object} load
+ */
+async function assignLoadToBoat(boat, load) {
+  const loadKey = datastore.key([LOAD, parseInt(load[0].id, 10)]);
+  datastore.update({
+    key: loadKey,
+    data: {
+      volume: load[0].volume,
+      item: load[0].item,
+      carrier: {
+        id: boat[0].id,
+        name: boat[0].name,
+      },
+      creation_date: load[0].creation_date,
+    },
+  });
+}
+
 export {
   postLoad,
   getLoad,
   getAllLoads,
   updateLoad,
   deleteLoad,
+  assignLoadToBoat,
   clearLoadCarrier,
 };
