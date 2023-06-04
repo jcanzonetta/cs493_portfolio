@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import json2html from 'node-json2html';
 import {auth} from 'express-openid-connect';
+import {postUser, getUser} from '../models/users.models.js';
 
 ***REMOVED***
 ***REMOVED***
@@ -29,6 +30,11 @@ router.use(auth(config));
 
 router.get('/', async (req, res) => {
   if (req.oidc.isAuthenticated()) {
+    let user = await getUser(req.oidc.user['sub']);
+    if (user[0] === undefined || user[0] === null) {
+      user = await postUser(req.oidc.user['sub']);
+    }
+
     const outputJSON = {
       name: req.oidc.user['name'],
       token: req.oidc.idToken,

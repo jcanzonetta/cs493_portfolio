@@ -195,9 +195,7 @@ router.put('/:boat_id/loads/:load_id', requireJwt, async (req, res) => {
         .status(404)
         .send({Error: 'The specified boat and/or load does not exist'});
   } else if (load[0].carrier !== null) {
-    res
-        .status(403)
-        .send({Error: 'The load is already on another boat'});
+    res.status(403).send({Error: 'The load is already on another boat'});
   } else {
     putLoad(req.params.load_id, boat);
     assignLoadToBoat(boat, load);

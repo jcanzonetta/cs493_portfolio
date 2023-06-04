@@ -10,6 +10,7 @@ router.use(express.urlencoded({extended: true}));
 router.get('/', async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
+    return;
   }
 
   const users = await getAllUsers();
