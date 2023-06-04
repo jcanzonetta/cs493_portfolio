@@ -56,8 +56,8 @@ async function postBoat(name, type, length, sub) {
  * @param {string/null} owner
  * @return {Object} Datastore Object
  */
-async function getBoats() {
-  let query = datastore.createQuery(BOAT).limit(5);
+async function getBoats(owner) {
+  let query = datastore.createQuery(BOAT).filter('owner', '=', owner).limit(5);
   const results = {};
 
   if (Object.keys(req.query).includes('cursor')) {

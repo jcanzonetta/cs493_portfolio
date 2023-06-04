@@ -63,6 +63,11 @@ router.get('/:boat_id', requireJwt, async (req, res) => {
     return;
   }
 
+  if (boat[0].owner != req.auth.sub) {
+    res.status(401).send({Error: 'Unauthorized'});
+    return;
+  }
+
   boat[0].self = getSelfUrl(req, req.params.boat_id);
   res.status(200).json(boat[0]);
 });
@@ -73,9 +78,16 @@ router.get('/', requireJwt, async (req, res) => {
     return;
   }
 
-  const boats = await getBoats();
+  const boats = await getBoats(req.auth.sub);
 
   res.status(200).send(boats);
+});
+
+router.patch('/:boat_id', requireJwt, async (req, res) => {
+  if (!req.accepts(['application/json'])) {
+    res.status(406).send({Error: 'Response body must be JSON'});
+    return;
+  }
 });
 
 router.delete('/:boat_id', requireJwt, async (req, res) => {
