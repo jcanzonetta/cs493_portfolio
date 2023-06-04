@@ -1,5 +1,6 @@
 import {datastore as ds} from '../datastore.js';
 import {fromDatastore} from '../datastore.js';
+import {getLoad, clearLoadCarrier} from './loads.models.js';
 
 const datastore = ds.datastore;
 
@@ -108,7 +109,35 @@ function updateBoat(boat, name, type, length) {
 async function deleteBoat(boatId) {
   const key = datastore.key([BOAT, parseInt(boatId, 10)]);
 
+  if (boat[0].loads !== null) {
+    boat[0].loads.forEach(async (element) => {
+      const load = await getLoad(element.id);
+      clearLoadCarrier(load);
+    });
+  }
+
   datastore.delete(key);
+}
+
+/**
+ * Removes a load from a boat.
+ * @param {Object} boat
+ * @param {Object} load
+ */
+function removeLoadFromBoat(boat, load) {
+  const boatKey = datastore.key([BOAT, parseInt(boat[0].id, 10)]);
+
+  const newLoads = boat[0].loads.filter((element) => element.id !== load[0].id);
+
+  datastore.update({
+    key: boatKey,
+    data: {
+      name: boat[0].name,
+      type: boat[0].type,
+      length: boat[0].length,
+      loads: newLoads,
+    },
+  });
 }
 
 /**
@@ -133,5 +162,6 @@ export {
   getAllBoats,
   updateBoat,
   deleteBoat,
+  removeLoadFromBoat,
   isDuplicateBoatName,
 };

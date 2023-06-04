@@ -1,6 +1,8 @@
 import {datastore as ds} from '../datastore.js';
 import {fromDatastore} from '../datastore.js';
 
+import {getBoat, removeLoadFromBoat} from './boats.models.js';
+
 const datastore = ds.datastore;
 
 const LOAD = 'Load';
@@ -101,7 +103,37 @@ function updateLoad(load, item, creationDate, volume) {
 async function deleteLoad(loadId) {
   const key = datastore.key([LOAD, parseInt(loadId, 10)]);
 
+  if (load[0].carrier !== null) {
+    const boat = await getBoat(load[0].carrier);
+    removeLoadFromBoat(boat, load);
+  }
+
   datastore.delete(key);
 }
 
-export {postLoad, getLoad, getAllLoads, updateLoad, deleteLoad};
+/**
+ * Sets carrier to null for a load in Datastore
+ * @param {Object} load
+ */
+function clearLoadCarrier(load) {
+  const loadKey = datastore.key([LOAD, parseInt(load[0].id, 10)]);
+
+  datastore.update({
+    key: loadKey,
+    data: {
+      volume: load[0].volume,
+      item: load[0].item,
+      carrier: null,
+      creation_date: load[0].creation_date,
+    },
+  });
+}
+
+export {
+  postLoad,
+  getLoad,
+  getAllLoads,
+  updateLoad,
+  deleteLoad,
+  clearLoadCarrier,
+};
