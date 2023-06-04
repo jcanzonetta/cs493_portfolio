@@ -1,7 +1,7 @@
 import express from 'express';
 
 import {getSelfUrl} from '../utils/general.utils.js';
-import {postLoad, getLoad} from '../models/loads.models.js';
+import {postLoad, getLoad, getAllLoads} from '../models/loads.models.js';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -46,6 +46,17 @@ router.get('/:load_id', async (req, res) => {
 
   load[0].self = getSelfUrl(req, req.params.load_id);
   res.status(200).json(load[0]);
+});
+
+router.get('/', async (req, res) => {
+  if (!req.accepts(['application/json'])) {
+    res.status(406).send({Error: 'Response body must be JSON'});
+    return;
+  }
+
+  const loads = await getAllLoads();
+
+  res.status(200).send(loads);
 });
 
 export default router;

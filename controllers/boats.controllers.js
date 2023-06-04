@@ -5,7 +5,7 @@ import {
   getBoat,
   postBoat,
   deleteBoat,
-  getBoats,
+  getAllBoats,
   isDuplicateBoatName,
 } from '../models/boats.models.js';
 import {getSelfUrl} from '../utils/general.utils.js';
@@ -78,7 +78,7 @@ router.get('/', requireJwt, async (req, res) => {
     return;
   }
 
-  const boats = await getBoats(req.auth.sub);
+  const boats = await getAllBoats(req.auth.sub);
 
   res.status(200).send(boats);
 });

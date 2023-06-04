@@ -52,11 +52,11 @@ async function postBoat(name, type, length, sub) {
 }
 
 /**
- * Gets a Datastore Object containing all boats (limit 3).
+ * Gets a Datastore Object containing all boats (limit 5).
  * @param {string/null} owner
  * @return {Object} Datastore Object
  */
-async function getBoats(owner) {
+async function getAllBoats(owner) {
   let query = datastore.createQuery(BOAT).filter('owner', '=', owner).limit(5);
   const results = {};
 
@@ -130,7 +130,7 @@ async function isDuplicateBoatName(name) {
 export {
   getBoat,
   postBoat,
-  getBoats,
+  getAllBoats,
   updateBoat,
   deleteBoat,
   isDuplicateBoatName,

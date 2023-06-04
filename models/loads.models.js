@@ -45,4 +45,31 @@ async function getLoad(loadId) {
   }
 }
 
-export {postLoad, getLoad};
+/**
+ * Gets a Datastore Object containing all loads (limit 5).
+ * @return {Object} Datastore Object
+ */
+async function getAllLoads() {
+  let query = datastore.createQuery(LOAD).limit(5);
+  const results = {};
+
+  if (Object.keys(req.query).includes('cursor')) {
+    query = query.start(req.query.cursor);
+  }
+
+  const entities = await datastore.runQuery(query);
+  results.loads = entities[0].map(ds.fromDatastore);
+
+  if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
+    results.next =
+      req.protocol +
+      '://' +
+      req.get('host') +
+      req.baseUrl +
+      '?cursor=' +
+      entities[1].endCursor;
+  }
+  return results;
+}
+
+export {postLoad, getLoad, getAllLoads};
