@@ -80,6 +80,28 @@ async function getBoats(owner) {
 }
 
 /**
+ * Updates all properties of a boat.
+ * @param {Object} boat Datastore object
+ * @param {string} name
+ * @param {string} type
+ * @param {string} length
+ * @return {Object} Datastore object
+ */
+function updateBoat(boat, name, type, length) {
+  const key = datastore.key([BOAT, parseInt(boat[0].id, 10)]);
+
+  const data = {
+    name: name,
+    type: type,
+    length: length,
+    loads: boat[0].loads,
+    owner: boat[0].owner,
+  };
+
+  return datastore.save({key: key, data: data});
+}
+
+/**
  * Removes a boat from Datastore and unloads from it carrier if necessary.
  * @param {string} boatId
  */
@@ -105,4 +127,11 @@ async function isDuplicateBoatName(name) {
   }
 }
 
-export {getBoat, postBoat, getBoats, deleteBoat, isDuplicateBoatName};
+export {
+  getBoat,
+  postBoat,
+  getBoats,
+  updateBoat,
+  deleteBoat,
+  isDuplicateBoatName,
+};
