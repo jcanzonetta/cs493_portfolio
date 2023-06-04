@@ -171,6 +171,7 @@ function putLoad(loadId, boat) {
       type: boat[0].type,
       length: boat[0].length,
       loads: boat[0].loads,
+      owner: boat[0].owner,
     },
   });
 }

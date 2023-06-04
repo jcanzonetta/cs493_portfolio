@@ -9,7 +9,11 @@ import {
   isDuplicateBoatName,
   putLoad,
 } from '../models/boats.models.js';
-import {assignLoadToBoat} from '../models/loads.models.js';
+import {
+  getLoad,
+  assignLoadToBoat,
+  clearLoadCarrier,
+} from '../models/loads.models.js';
 import {getSelfUrl} from '../utils/general.utils.js';
 
 // eslint-disable-next-line new-cap
@@ -200,9 +204,7 @@ router.put(
       const boat = await getBoat(req.params.boat_id);
       const load = await getLoad(req.params.load_id);
 
-      if (boat[0].owner != req.auth.sub) {
-        res.status(401).send({Error: 'Unauthorized'});
-      } else if (
+      if (
         boat[0] === undefined ||
       boat[0] === null ||
       load[0] === undefined ||
@@ -211,13 +213,22 @@ router.put(
         res
             .status(404)
             .send({Error: 'The specified boat and/or load does not exist'});
-      } else if (load[0].carrier !== null) {
-        res.status(403).send({Error: 'The load is already on another boat'});
-      } else {
-        putLoad(req.params.load_id, boat);
-        assignLoadToBoat(boat, load);
-        res.status(204).send();
+        return;
       }
+
+      if (boat[0].owner != req.auth.sub) {
+        res.status(401).send({Error: 'Unauthorized'});
+        return;
+      }
+
+      if (load[0].carrier !== null) {
+        res.status(403).send({Error: 'The load is already on another boat'});
+        return;
+      }
+
+      putLoad(req.params.load_id, boat);
+      assignLoadToBoat(boat, load);
+      res.status(204).send();
     },
 );
 
