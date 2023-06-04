@@ -154,7 +154,7 @@ router.patch('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
     load.self = getSelfUrl(req, load.id, 'loads');
   });
 
-  res.status(200).send(updateBoat);
+  res.status(200).send(updatedBoat);
 });
 
 router.put('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
