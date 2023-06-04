@@ -103,7 +103,7 @@ router.get('/', requireJwt, handleUnauthorized, async (req, res) => {
     return;
   }
 
-  const boats = await getAllBoats(req.auth.sub);
+  const boats = await getAllBoats(req, req.auth.sub);
 
   res.status(200).send(boats);
 });

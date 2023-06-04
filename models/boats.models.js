@@ -54,10 +54,11 @@ async function postBoat(name, type, length, sub) {
 
 /**
  * Gets a Datastore Object containing all boats (limit 5).
- * @param {string/null} owner
+ * @param {Object} req
+ * @param {string} owner
  * @return {Object} Datastore Object
  */
-async function getAllBoats(owner) {
+async function getAllBoats(req, owner) {
   let query = datastore.createQuery(BOAT).filter('owner', '=', owner).limit(5);
   const results = {};
 
@@ -66,9 +67,9 @@ async function getAllBoats(owner) {
   }
 
   const entities = await datastore.runQuery(query);
-  results.boats = entities[0].map(ds.fromDatastore);
+  results.boats = entities[0].map(fromDatastore);
 
-  if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
+  if (entities[1].moreResults !== datastore.NO_MORE_RESULTS) {
     results.next =
       req.protocol +
       '://' +

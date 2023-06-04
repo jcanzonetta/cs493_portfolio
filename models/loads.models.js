@@ -49,9 +49,10 @@ async function getLoad(loadId) {
 
 /**
  * Gets a Datastore Object containing all loads (limit 5).
+ * @param {Object} req
  * @return {Object} Datastore Object
  */
-async function getAllLoads() {
+async function getAllLoads(req) {
   let query = datastore.createQuery(LOAD).limit(5);
   const results = {};
 
@@ -60,9 +61,10 @@ async function getAllLoads() {
   }
 
   const entities = await datastore.runQuery(query);
-  results.loads = entities[0].map(ds.fromDatastore);
+  console.log(entities);
+  results.loads = entities[0].map(fromDatastore);
 
-  if (entities[1].moreResults !== ds.Datastore.NO_MORE_RESULTS) {
+  if (entities[1].moreResults !== datastore.NO_MORE_RESULTS) {
     results.next =
       req.protocol +
       '://' +

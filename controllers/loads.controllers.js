@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
     return;
   }
 
-  const loads = await getAllLoads();
+  const loads = await getAllLoads(req);
 
   res.status(200).send(loads);
 });
