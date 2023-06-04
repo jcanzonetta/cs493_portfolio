@@ -9,7 +9,7 @@ function getSelfUrl(req, id, baseUrl) {
   if (baseUrl === undefined) {
     return req.protocol + '://' + req.get('host') + req.baseUrl + '/' + id;
   } else {
-    return req.protocol + '://' + req.get('host') + baseUrl + '/' + id;
+    return req.protocol + '://' + req.get('host') + '/' + baseUrl + '/' + id;
   }
 }
 

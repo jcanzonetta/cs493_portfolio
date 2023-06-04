@@ -88,6 +88,11 @@ router.get('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   }
 
   boat[0].self = getSelfUrl(req, req.params.boat_id);
+
+  boat[0].loads.forEach( (load) => {
+    load.self = getSelfUrl(req, load.id, 'loads');
+  });
+
   res.status(200).json(boat[0]);
 });
 

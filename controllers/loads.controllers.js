@@ -51,6 +51,9 @@ router.get('/:load_id', async (req, res) => {
   }
 
   load[0].self = getSelfUrl(req, req.params.load_id);
+
+  load[0].carrier.self = getSelfUrl(req, load[0].carrier.id, 'boats');
+
   res.status(200).json(load[0]);
 });
 
