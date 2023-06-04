@@ -18,11 +18,25 @@ const router = express.Router();
 router.use(express.json());
 router.use(express.urlencoded({extended: true}));
 
+/**
+ * Sends 401 error with appropriate Error body per specifications.
+ * @param {Object} err
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Object} next
+ */
+const handleUnauthorized = function(err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).send({Error: 'Unauthorized'});
+    next;
+  }
+};
+
 /*
  *  Boat Endpoints
  */
 
-router.post('/', requireJwt, async (req, res) => {
+router.post('/', requireJwt, handleUnauthorized, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -52,7 +66,7 @@ router.post('/', requireJwt, async (req, res) => {
   });
 });
 
-router.get('/:boat_id', requireJwt, async (req, res) => {
+router.get('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -74,7 +88,7 @@ router.get('/:boat_id', requireJwt, async (req, res) => {
   res.status(200).json(boat[0]);
 });
 
-router.get('/', requireJwt, async (req, res) => {
+router.get('/', requireJwt, handleUnauthorized, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -85,7 +99,7 @@ router.get('/', requireJwt, async (req, res) => {
   res.status(200).send(boats);
 });
 
-router.patch('/:boat_id', requireJwt, async (req, res) => {
+router.patch('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -126,7 +140,7 @@ router.patch('/:boat_id', requireJwt, async (req, res) => {
   });
 });
 
-router.put('/:boat_id', requireJwt, async (req, res) => {
+router.put('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   if (!req.accepts(['application/json'])) {
     res.status(406).send({Error: 'Response body must be JSON'});
     return;
@@ -167,7 +181,7 @@ router.put('/:boat_id', requireJwt, async (req, res) => {
   });
 });
 
-router.delete('/:boat_id', requireJwt, async (req, res) => {
+router.delete('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   const boat = await getBoat(req.params.boat_id);
   if (boat[0] === undefined || boat[0] === null) {
     res.status(404).send({Error: 'No boat with this boat_id exists'});
@@ -179,53 +193,63 @@ router.delete('/:boat_id', requireJwt, async (req, res) => {
   }
 });
 
-router.put('/:boat_id/loads/:load_id', requireJwt, async (req, res) => {
-  const boat = await getBoat(req.params.boat_id);
-  const load = await getLoad(req.params.load_id);
+router.put(
+    '/:boat_id/loads/:load_id',
+    requireJwt,
+    handleUnauthorized,
+    async (req, res) => {
+      const boat = await getBoat(req.params.boat_id);
+      const load = await getLoad(req.params.load_id);
 
-  if (boat[0].owner != req.auth.sub) {
-    res.status(401).send({Error: 'Unauthorized'});
-  } else if (
-    boat[0] === undefined ||
-    boat[0] === null ||
-    load[0] === undefined ||
-    load[0] === null
-  ) {
-    res
-        .status(404)
-        .send({Error: 'The specified boat and/or load does not exist'});
-  } else if (load[0].carrier !== null) {
-    res.status(403).send({Error: 'The load is already on another boat'});
-  } else {
-    putLoad(req.params.load_id, boat);
-    assignLoadToBoat(boat, load);
-    res.status(204).send();
-  }
-});
+      if (boat[0].owner != req.auth.sub) {
+        res.status(401).send({Error: 'Unauthorized'});
+      } else if (
+        boat[0] === undefined ||
+      boat[0] === null ||
+      load[0] === undefined ||
+      load[0] === null
+      ) {
+        res
+            .status(404)
+            .send({Error: 'The specified boat and/or load does not exist'});
+      } else if (load[0].carrier !== null) {
+        res.status(403).send({Error: 'The load is already on another boat'});
+      } else {
+        putLoad(req.params.load_id, boat);
+        assignLoadToBoat(boat, load);
+        res.status(204).send();
+      }
+    },
+);
 
-router.delete('/:boat_id/loads/:load_id', requireJwt, async (req, res) => {
-  const boat = await getBoat(req.params.boat_id);
-  const load = await getLoad(req.params.load_id);
+router.delete(
+    '/:boat_id/loads/:load_id',
+    requireJwt,
+    handleUnauthorized,
+    async (req, res) => {
+      const boat = await getBoat(req.params.boat_id);
+      const load = await getLoad(req.params.load_id);
 
-  if (boat[0].owner != req.auth.sub) {
-    res.status(401).send({Error: 'Unauthorized'});
-  } else if (
-    boat[0] === undefined ||
-    boat[0] === null ||
-    load[0] === undefined ||
-    load[0] === null ||
-    load[0].carrier === null ||
-    load[0].carrier.id !== req.params.boat_id
-  ) {
-    res.status(404).send({
-      Error:
-        'No boat with this boat_id is loaded with the load with this load_id',
-    });
-  } else {
-    removeLoadFromBoat(boat, load);
-    clearLoadCarrier(load);
-    res.status(204).send();
-  }
-});
+      if (boat[0].owner != req.auth.sub) {
+        res.status(401).send({Error: 'Unauthorized'});
+      } else if (
+        boat[0] === undefined ||
+      boat[0] === null ||
+      load[0] === undefined ||
+      load[0] === null ||
+      load[0].carrier === null ||
+      load[0].carrier.id !== req.params.boat_id
+      ) {
+        res.status(404).send({
+          Error:
+          'No boat with this boat_id is loaded with the load with this load_id',
+        });
+      } else {
+        removeLoadFromBoat(boat, load);
+        clearLoadCarrier(load);
+        res.status(204).send();
+      }
+    },
+);
 
 export default router;
