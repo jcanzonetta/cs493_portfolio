@@ -119,6 +119,42 @@ router.patch('/:boat_id', requireJwt, async (req, res) => {
   });
 });
 
+router.put('/:boat_id', requireJwt, async (req, res) => {
+  if (!req.accepts(['application/json'])) {
+    res.status(406).send({Error: 'Response body must be JSON'});
+    return;
+  }
+
+  const boat = await getBoat(req.params.boat_id);
+  if (boat[0] === undefined || boat[0] === null) {
+    res.status(401).send({Error: 'Unauthorized'});
+    return;
+  }
+
+  if (req.body.name !== undefined && boat[0].name !== req.body.name) {
+    const duplicateName = await isDuplicateBoatName(req.body.name);
+    if (duplicateName) {
+      res.status(403).send({Error: 'The requested name is already taken'});
+      return;
+    }
+  }
+
+  const name = 'name' in req.body ? req.body['name'] : boat[0].name;
+  const type = 'type' in req.body ? req.body['type'] : boat[0].type;
+  const length = 'length' in req.body ? req.body['length'] : boat[0].length;
+
+  const key = await updateBoat(boat, name, type, length);
+  res.status(200).send({
+    id: key.id,
+    name: name,
+    type: type,
+    length: length,
+    loads: boat[0].loads,
+    owner: boat[0].owner,
+    self: getSelfUrl(req, key.id),
+  });
+});
+
 router.delete('/:boat_id', requireJwt, async (req, res) => {
   const boat = await getBoat(req.params.boat_id);
   if (boat[0] === undefined || boat[0] === null) {
