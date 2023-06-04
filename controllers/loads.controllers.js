@@ -52,7 +52,9 @@ router.get('/:load_id', async (req, res) => {
 
   load[0].self = getSelfUrl(req, req.params.load_id);
 
-  load[0].carrier.self = getSelfUrl(req, load[0].carrier.id, 'boats');
+  if (load[0].carrier !== null) {
+    load[0].carrier.self = getSelfUrl(req, load[0].carrier.id, 'boats');
+  }
 
   res.status(200).json(load[0]);
 });
@@ -134,7 +136,7 @@ router.delete('/:load_id', async (req, res) => {
   if (load[0] === undefined || load[0] === null) {
     res.status(404).send({Error: 'No load with this load_id exists'});
   } else {
-    deleteLoad(req.params.load_id);
+    deleteLoad(load);
     res.status(204).send();
   }
 });

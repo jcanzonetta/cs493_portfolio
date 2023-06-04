@@ -98,13 +98,13 @@ function updateLoad(load, item, creationDate, volume) {
 /**
  * Removes a load from Datastore and unloads from it from its carrier
  * if necessary.
- * @param {string} loadId
+ * @param {Object} load
  */
-async function deleteLoad(loadId) {
-  const key = datastore.key([LOAD, parseInt(loadId, 10)]);
+async function deleteLoad(load) {
+  const key = datastore.key([LOAD, parseInt(load[0].id, 10)]);
 
   if (load[0].carrier !== null) {
-    const boat = await getBoat(load[0].carrier);
+    const boat = await getBoat(load[0].carrier.id);
     removeLoadFromBoat(boat, load);
   }
 

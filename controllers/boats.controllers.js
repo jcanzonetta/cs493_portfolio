@@ -7,6 +7,7 @@ import {
   deleteBoat,
   getAllBoats,
   isDuplicateBoatName,
+  removeLoadFromBoat,
   putLoad,
 } from '../models/boats.models.js';
 import {
@@ -89,7 +90,7 @@ router.get('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
 
   boat[0].self = getSelfUrl(req, req.params.boat_id);
 
-  boat[0].loads.forEach( (load) => {
+  boat[0].loads.forEach((load) => {
     load.self = getSelfUrl(req, load.id, 'loads');
   });
 
@@ -245,9 +246,7 @@ router.delete(
       const boat = await getBoat(req.params.boat_id);
       const load = await getLoad(req.params.load_id);
 
-      if (boat[0].owner != req.auth.sub) {
-        res.status(401).send({Error: 'Unauthorized'});
-      } else if (
+      if (
         boat[0] === undefined ||
       boat[0] === null ||
       load[0] === undefined ||
@@ -259,11 +258,17 @@ router.delete(
           Error:
           'No boat with this boat_id is loaded with the load with this load_id',
         });
-      } else {
-        removeLoadFromBoat(boat, load);
-        clearLoadCarrier(load);
-        res.status(204).send();
+        return;
       }
+
+      if (boat[0].owner != req.auth.sub) {
+        res.status(401).send({Error: 'Unauthorized'});
+        return;
+      }
+
+      removeLoadFromBoat(boat, load);
+      clearLoadCarrier(load);
+      res.status(204).send();
     },
 );
 

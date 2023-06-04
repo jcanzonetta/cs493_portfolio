@@ -108,6 +108,7 @@ function updateBoat(boat, name, type, length) {
  */
 async function deleteBoat(boatId) {
   const key = datastore.key([BOAT, parseInt(boatId, 10)]);
+  const boat = await getBoat(boatId);
 
   if (boat[0].loads !== null) {
     boat[0].loads.forEach(async (element) => {
@@ -136,6 +137,7 @@ function removeLoadFromBoat(boat, load) {
       type: boat[0].type,
       length: boat[0].length,
       loads: newLoads,
+      owner: boat[0].owner,
     },
   });
 }
