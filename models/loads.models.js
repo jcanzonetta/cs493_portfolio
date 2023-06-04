@@ -61,7 +61,6 @@ async function getAllLoads(req) {
   }
 
   const entities = await datastore.runQuery(query);
-  console.log(entities);
   results.loads = entities[0].map(fromDatastore);
 
   if (entities[1].moreResults !== datastore.NO_MORE_RESULTS) {

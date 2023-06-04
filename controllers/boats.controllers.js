@@ -8,6 +8,7 @@ import {
   getAllBoats,
   isDuplicateBoatName,
   removeLoadFromBoat,
+  updateBoat,
   putLoad,
 } from '../models/boats.models.js';
 import {
@@ -138,7 +139,8 @@ router.patch('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   const length = 'length' in req.body ? req.body['length'] : boat[0].length;
 
   const key = await updateBoat(boat, name, type, length);
-  res.status(200).send({
+
+  const updatedBoat = {
     id: key.id,
     name: name,
     type: type,
@@ -146,7 +148,13 @@ router.patch('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
     loads: boat[0].loads,
     owner: boat[0].owner,
     self: getSelfUrl(req, key.id),
+  };
+
+  updatedBoat.loads.forEach((load) => {
+    load.self = getSelfUrl(req, load.id, 'loads');
   });
+
+  res.status(200).send(updateBoat);
 });
 
 router.put('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
