@@ -67,6 +67,10 @@ router.get('/', async (req, res) => {
 
   const loads = await getAllLoads(req);
 
+  loads.loads.forEach((load) => {
+    load.self = getSelfUrl(req, load.id, 'loads');
+  });
+
   res.status(200).send(loads);
 });
 

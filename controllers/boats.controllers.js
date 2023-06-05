@@ -106,6 +106,10 @@ router.get('/', requireJwt, handleUnauthorized, async (req, res) => {
 
   const boats = await getAllBoats(req, req.auth.sub);
 
+  boats.boats.forEach((boat) => {
+    boat.self = getSelfUrl(req, boat.id, 'boats');
+  });
+
   res.status(200).send(boats);
 });
 
