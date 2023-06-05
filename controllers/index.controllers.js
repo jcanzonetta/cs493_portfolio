@@ -37,6 +37,7 @@ router.get('/', async (req, res) => {
 
     const outputJSON = {
       name: req.oidc.user['name'],
+      uniqueID: req.oidc.user['sub'],
       token: req.oidc.idToken,
     };
 
@@ -50,7 +51,8 @@ router.get('/', async (req, res) => {
             '<>': 'ul',
             'html': [
               {'<>': 'li', 'html': 'name: ${name}'},
-              {'<>': 'li', 'html': 'access token: ${token}'},
+              {'<>': 'li', 'html': 'sub: ${uniqueID}'},
+              {'<>': 'li', 'html': 'JWT: ${token}'},
             ],
           },
         ],
