@@ -59,7 +59,10 @@ async function postBoat(name, type, length, sub) {
  * @return {Object} Datastore Object
  */
 async function getAllBoats(req, owner) {
-  let query = datastore.createQuery(BOAT).filter('owner', '=', owner).limit(5);
+  let query = datastore.createQuery(BOAT).filter('owner', '=', owner);
+  const allBoats = await datastore.runQuery(query);
+  const count = allBoats[0].length;
+  query.limit(5);
   const results = {};
 
   if (Object.keys(req.query).includes('cursor')) {
@@ -68,6 +71,7 @@ async function getAllBoats(req, owner) {
 
   const entities = await datastore.runQuery(query);
   results.boats = entities[0].map(fromDatastore);
+  results.total = count;
 
   if (entities[1].moreResults !== datastore.NO_MORE_RESULTS) {
     results.next =

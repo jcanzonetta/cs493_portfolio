@@ -53,7 +53,10 @@ async function getLoad(loadId) {
  * @return {Object} Datastore Object
  */
 async function getAllLoads(req) {
-  let query = datastore.createQuery(LOAD).limit(5);
+  let query = datastore.createQuery(LOAD);
+  const allLoads = await datastore.runQuery(query);
+  const count = allLoads[0].length;
+  query.limit(5);
   const results = {};
 
   if (Object.keys(req.query).includes('cursor')) {
@@ -62,6 +65,7 @@ async function getAllLoads(req) {
 
   const entities = await datastore.runQuery(query);
   results.loads = entities[0].map(fromDatastore);
+  results.total = count;
 
   if (entities[1].moreResults !== datastore.NO_MORE_RESULTS) {
     results.next =
