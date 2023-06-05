@@ -108,6 +108,10 @@ router.get('/', requireJwt, handleUnauthorized, async (req, res) => {
 
   boats.boats.forEach((boat) => {
     boat.self = getSelfUrl(req, boat.id, 'boats');
+
+    boat.loads.forEach((load) => {
+      load.self = getSelfUrl(req, load.id, 'loads');
+    });
   });
 
   res.status(200).send(boats);
@@ -142,16 +146,16 @@ router.patch('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   const type = 'type' in req.body ? req.body['type'] : boat[0].type;
   const length = 'length' in req.body ? req.body['length'] : boat[0].length;
 
-  const key = await updateBoat(boat, name, type, length);
+  await updateBoat(boat, name, type, length);
 
   const updatedBoat = {
-    id: key.id,
+    id: boat[0].id,
     name: name,
     type: type,
     length: length,
     loads: boat[0].loads,
     owner: boat[0].owner,
-    self: getSelfUrl(req, key.id),
+    self: getSelfUrl(req, boat[0].id),
   };
 
   updatedBoat.loads.forEach((load) => {
@@ -188,16 +192,16 @@ router.put('/:boat_id', requireJwt, handleUnauthorized, async (req, res) => {
   const type = 'type' in req.body ? req.body['type'] : boat[0].type;
   const length = 'length' in req.body ? req.body['length'] : boat[0].length;
 
-  const key = await updateBoat(boat, name, type, length);
+  await updateBoat(boat, name, type, length);
 
   const updatedBoat = {
-    id: key.id,
+    id: boat[0].id,
     name: name,
     type: type,
     length: length,
     loads: boat[0].loads,
     owner: boat[0].owner,
-    self: getSelfUrl(req, key.id),
+    self: getSelfUrl(req, boat[0].id),
   };
 
   updatedBoat.loads.forEach((load) => {

@@ -69,6 +69,10 @@ router.get('/', async (req, res) => {
 
   loads.loads.forEach((load) => {
     load.self = getSelfUrl(req, load.id, 'loads');
+
+    if (load.carrier !== null) {
+      load.carrier.self = getSelfUrl(req, load.carrier.id, 'boats');
+    }
   });
 
   res.status(200).send(loads);
@@ -93,23 +97,19 @@ router.patch('/:load_id', async (req, res) => {
       load[0].creation_date;
   const volume = 'volume' in req.body ? req.body['volume'] : load[0].volume;
 
-  const key = await updateLoad(load, item, creationDate, volume);
+  await updateLoad(load, item, creationDate, volume);
 
   const updatedLoad = {
-    id: key.id,
+    id: load[0].id,
     item: item,
     creation_date: creationDate,
     volume: volume,
     carrier: load[0].carrier,
-    self: getSelfUrl(req, key.id),
+    self: getSelfUrl(req, load[0].id),
   };
 
   if (updatedLoad.carrier !== null) {
-    updatedLoad.carrier.self = getSelfUrl(
-        req,
-        updatedLoad.carrier.id,
-        'loads',
-    );
+    updatedLoad.carrier.self = getSelfUrl(req, updatedLoad.carrier.id, 'boats');
   }
 
   res.status(200).send(updatedLoad);
@@ -134,23 +134,19 @@ router.put('/:load_id', async (req, res) => {
       load[0].creation_date;
   const volume = 'volume' in req.body ? req.body['volume'] : load[0].volume;
 
-  const key = await updateLoad(load, item, creationDate, volume);
+  await updateLoad(load, item, creationDate, volume);
 
   const updatedLoad = {
-    id: key.id,
+    id: load[0].id,
     item: item,
     creation_date: creationDate,
     volume: volume,
     carrier: load[0].carrier,
-    self: getSelfUrl(req, key.id),
+    self: getSelfUrl(req, load[0].id),
   };
 
   if (updatedLoad.carrier !== null) {
-    updatedLoad.carrier.self = getSelfUrl(
-        req,
-        updatedLoad.carrier.id,
-        'loads',
-    );
+    updatedLoad.carrier.self = getSelfUrl(req, updatedLoad.carrier.id, 'boats');
   }
 
   res.status(200).send(updatedLoad);
