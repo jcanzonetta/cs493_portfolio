@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
             '<>': 'ul',
             'html': [
               {'<>': 'li', 'html': 'name: ${name}'},
-              {'<>': 'li', 'html': 'sub: ${uniqueID}'},
+              {'<>': 'li', 'html': 'sub/userID: ${uniqueID}'},
               {'<>': 'li', 'html': 'JWT: ${token}'},
             ],
           },

@@ -17,4 +17,14 @@ router.get('/', async (req, res) => {
   res.status(200).send(users);
 });
 
+router.delete('/', (req, res) => {
+  res.set('Allow', 'GET');
+  res.status(405).end();
+});
+
+router.put('/', (req, res) => {
+  res.set('Allow', 'GET');
+  res.status(405).end();
+});
+
 export default router;
