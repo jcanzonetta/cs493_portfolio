@@ -3,12 +3,7 @@ import path from 'path';
 import json2html from 'node-json2html';
 import {auth} from 'express-openid-connect';
 import {postUser, getUser} from '../models/users.models.js';
-
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
+import {CLIENT_ID, CLIENT_SECRET, DOMAIN, BASEURL} from '../config.js';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
